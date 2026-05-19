@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoIQ — AI-Powered Video Insights Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0e;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --bg4: #1f2430;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f2f7;
+    --text2: #8b92a5;
+    --text3: #555e72;
+    --accent: #4f7cff;
+    --accent2: #7b5dfa;
+    --accent3: #00d4a8;
+    --accent4: #ff6b6b;
+    --accent5: #f5a623;
+    --glow: rgba(79, 124, 255, 0.15);
+    --glow2: rgba(123, 93, 250, 0.1);
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated gradient orbs in background */
+  body::before {
+    content:'';
+    position:fixed;
+    top:-200px; left:-200px;
+    width:600px; height:600px;
+    background: radial-gradient(circle, rgba(79,124,255,0.08) 0%, transparent 70%);
+    border-radius:50%;
+    pointer-events:none;
+    animation: orb1 12s ease-in-out infinite alternate;
+    z-index:0;
+  }
+  body::after {
+    content:'';
+    position:fixed;
+    bottom:-200px; right:-200px;
+    width:500px; height:500px;
+    background: radial-gradient(circle, rgba(0,212,168,0.06) 0%, transparent 70%);
+    border-radius:50%;
+    pointer-events:none;
+    animation: orb2 15s ease-in-out infinite alternate;
+    z-index:0;
+  }
+  @keyframes orb1 { to { transform: translate(100px, 80px); } }
+  @keyframes orb2 { to { transform: translate(-80px, -60px); } }
+
+  /* NAV */
+  nav {
+    position:sticky; top:0; z-index:100;
+    background: rgba(10,11,14,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display:flex; align-items:center; justify-content:space-between;
+    height:56px;
+  }
+  .logo {
+    font-family: var(--display);
+    font-weight:800;
+    font-size:20px;
+    letter-spacing:-0.5px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .logo span { -webkit-text-fill-color: var(--accent3); }
+  .nav-tabs {
+    display:flex; gap:4px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:4px;
+  }
+  .nav-tab {
+    padding:5px 14px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    color: var(--text2);
+    transition:all 0.2s;
+    border:none; background:transparent;
+    font-family: var(--body);
+  }
+  .nav-tab.active {
+    background: var(--bg4);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .nav-right {
+    display:flex; gap:8px; align-items:center;
+  }
+  .badge-live {
+    display:flex; align-items:center; gap:6px;
+    background: rgba(0,212,168,0.1);
+    border:1px solid rgba(0,212,168,0.2);
+    border-radius:20px;
+    padding:4px 10px;
+    font-size:12px;
+    color: var(--accent3);
+    font-weight:500;
+  }
+  .dot-live {
+    width:6px; height:6px;
+    border-radius:50%;
+    background: var(--accent3);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* PAGE SECTIONS */
+  .page { display:none; position:relative; z-index:1; }
+  .page.active { display:block; }
+
+  /* HERO / UPLOAD PAGE */
+  .hero {
+    padding: 60px 2rem 40px;
+    text-align:center;
+    max-width:800px;
+    margin:0 auto;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background: rgba(79,124,255,0.1);
+    border:1px solid rgba(79,124,255,0.2);
+    border-radius:20px;
+    padding:5px 14px;
+    font-size:12px;
+    color: var(--accent);
+    font-weight:500;
+    margin-bottom:20px;
+    font-family: var(--mono);
+    letter-spacing:0.5px;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight:800;
+    line-height:1.1;
+    letter-spacing:-1.5px;
+    margin-bottom:16px;
+  }
+  .hero h1 em {
+    font-style:normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .hero p {
+    color: var(--text2);
+    font-size:17px;
+    line-height:1.6;
+    max-width:560px;
+    margin:0 auto 36px;
+  }
+
+  /* UPLOAD AREA */
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius:16px;
+    padding: 50px 30px;
+    background: var(--bg2);
+    cursor:pointer;
+    transition:all 0.3s;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:24px;
+  }
+  .upload-zone:hover, .upload-zone.drag {
+    border-color: var(--accent);
+    background: rgba(79,124,255,0.05);
+  }
+  .upload-icon {
+    width:56px; height:56px;
+    border-radius:12px;
+    background: rgba(79,124,255,0.1);
+    border:1px solid rgba(79,124,255,0.2);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px;
+    font-size:24px;
+  }
+  .upload-zone h3 {
+    font-family: var(--display);
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .upload-zone p {
+    color: var(--text2);
+    font-size:13px;
+    margin-bottom:16px;
+  }
+  .upload-formats {
+    display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+  }
+  .fmt-tag {
+    padding:3px 10px;
+    border-radius:6px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    font-size:11px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+  .btn-primary {
+    display:inline-flex; align-items:center; gap:8px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:11px 22px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    font-family: var(--body);
+    transition:all 0.2s;
+    letter-spacing:0.2px;
+  }
+  .btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
+  .btn-secondary {
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--bg3);
+    border:1px solid var(--border2);
+    color: var(--text);
+    border-radius:10px;
+    padding:10px 20px;
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    font-family: var(--body);
+    transition:all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--bg4); border-color: var(--border2); }
+
+  /* USE CASE CARDS */
+  .section-title {
+    font-family: var(--display);
+    font-size:13px;
+    font-weight:600;
+    color: var(--text3);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-bottom:16px;
+  }
+  .use-case-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:12px;
+    margin-bottom:40px;
+  }
+  .use-case-card {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    cursor:pointer;
+    transition:all 0.2s;
+    text-align:left;
+  }
+  .use-case-card:hover {
+    border-color: var(--border2);
+    background: var(--bg3);
+    transform:translateY(-2px);
+  }
+  .use-case-card.selected {
+    border-color: var(--accent);
+    background: rgba(79,124,255,0.07);
+  }
+  .uc-icon {
+    font-size:20px;
+    margin-bottom:10px;
+    display:block;
+  }
+  .uc-title {
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:4px;
+    font-family: var(--display);
+  }
+  .uc-desc { font-size:12px; color: var(--text2); line-height:1.5; }
+
+  /* PROCESSING MODAL */
+  .processing-overlay {
+    display:none;
+    position:fixed; inset:0;
+    background: rgba(10,11,14,0.92);
+    z-index:200;
+    align-items:center; justify-content:center;
+    flex-direction:column;
+    gap:20px;
+    backdrop-filter:blur(10px);
+  }
+  .processing-overlay.show { display:flex; }
+  .process-box {
+    background: var(--bg2);
+    border:1px solid var(--border2);
+    border-radius:20px;
+    padding:40px;
+    width:440px;
+    text-align:center;
+  }
+  .process-title {
+    font-family: var(--display);
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .process-sub { color: var(--text2); font-size:13px; margin-bottom:32px; }
+  .pipeline-steps {
+    display:flex; flex-direction:column; gap:0;
+    text-align:left;
+  }
+  .pipe-step {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+    color: var(--text2);
+    transition:all 0.3s;
+  }
+  .pipe-step:last-child { border-bottom:none; }
+  .pipe-step.done { color: var(--accent3); }
+  .pipe-step.active { color: var(--text); }
+  .pipe-icon {
+    width:24px; height:24px;
+    border-radius:50%;
+    background: var(--bg3);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px;
+    flex-shrink:0;
+    border:1px solid var(--border);
+  }
+  .pipe-step.done .pipe-icon { background: rgba(0,212,168,0.15); border-color:rgba(0,212,168,0.3); }
+  .pipe-step.active .pipe-icon { background: rgba(79,124,255,0.15); border-color:rgba(79,124,255,0.3); animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .progress-bar-wrap {
+    height:4px;
+    background: var(--bg3);
+    border-radius:4px;
+    margin-top:24px;
+    overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius:4px;
+    width:0%;
+    transition:width 0.5s ease;
+  }
+
+  /* DASHBOARD PAGE */
+  .dashboard {
+    padding:24px 2rem;
+    max-width:1400px;
+    margin:0 auto;
+  }
+  .dash-header {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    margin-bottom:28px;
+    gap:16px;
+  }
+  .video-title-block h2 {
+    font-family: var(--display);
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .video-meta-tags {
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .meta-tag {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 10px;
+    border-radius:6px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    font-size:12px;
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+  .meta-tag.type { background: rgba(79,124,255,0.08); border-color:rgba(79,124,255,0.2); color: var(--accent); }
+
+  .action-bar {
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .btn-icon {
+    display:flex; align-items:center; gap:6px;
+    background: var(--bg3);
+    border:1px solid var(--border2);
+    color: var(--text);
+    border-radius:8px;
+    padding:8px 14px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    font-family: var(--body);
+    transition:all 0.2s;
+    white-space:nowrap;
+  }
+  .btn-icon:hover { background: var(--bg4); }
+  .btn-icon.accent { background: rgba(79,124,255,0.15); border-color:rgba(79,124,255,0.3); color: var(--accent); }
+
+  /* STAT CARDS */
+  .stat-row {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap:12px;
+    margin-bottom:24px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+  }
+  .stat-label { font-size:11px; color: var(--text3); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.8px; }
+  .stat-val {
+    font-family: var(--display);
+    font-size:26px;
+    font-weight:700;
+    line-height:1;
+    margin-bottom:4px;
+  }
+  .stat-sub { font-size:12px; color: var(--text3); }
+  .stat-card.accent { border-color:rgba(79,124,255,0.2); background: rgba(79,124,255,0.06); }
+  .stat-card.accent .stat-val { color: var(--accent); }
+  .stat-card.green { border-color:rgba(0,212,168,0.2); background: rgba(0,212,168,0.05); }
+  .stat-card.green .stat-val { color: var(--accent3); }
+
+  /* MAIN LAYOUT */
+  .dash-grid {
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:16px;
+  }
+  @media(max-width:900px) { .dash-grid { grid-template-columns:1fr; } }
+
+  /* TABS IN MAIN PANEL */
+  .panel {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .panel-tabs {
+    display:flex;
+    border-bottom:1px solid var(--border);
+    padding:0 16px;
+    gap:0;
+  }
+  .panel-tab {
+    padding:12px 16px;
+    font-size:13px;
+    font-weight:500;
+    color: var(--text2);
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all 0.2s;
+    white-space:nowrap;
+    background:none; border-top:none; border-left:none; border-right:none;
+    font-family: var(--body);
+  }
+  .panel-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .panel-content { padding:20px; }
+  .panel-pane { display:none; }
+  .panel-pane.active { display:block; }
+
+  /* TRANSCRIPT */
+  .transcript-search {
+    display:flex; gap:8px; margin-bottom:16px;
+  }
+  .search-input {
+    flex:1;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    color: var(--text);
+    font-size:13px;
+    font-family: var(--body);
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+
+  .transcript-block {
+    display:flex; gap:12px;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background 0.2s;
+    margin-bottom:4px;
+  }
+  .transcript-block:hover { background: var(--bg3); }
+  .transcript-block.highlighted { background: rgba(79,124,255,0.08); border:1px solid rgba(79,124,255,0.15); }
+  .ts-time {
+    font-family: var(--mono);
+    font-size:11px;
+    color: var(--accent);
+    white-space:nowrap;
+    padding-top:2px;
+    min-width:42px;
+  }
+  .ts-text { font-size:13px; line-height:1.6; color: var(--text2); }
+  .ts-text mark { background: rgba(79,124,255,0.25); color: var(--text); border-radius:3px; padding:0 2px; }
+
+  /* SUMMARY PANEL */
+  .summary-section { margin-bottom:24px; }
+  .summary-section h4 {
+    font-family: var(--display);
+    font-size:12px;
+    font-weight:600;
+    color: var(--text3);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  .summary-text { font-size:14px; line-height:1.7; color: var(--text2); }
+  .key-point {
+    display:flex; gap:10px; align-items:flex-start;
+    padding:10px 12px;
+    background: var(--bg3);
+    border-radius:8px;
+    margin-bottom:6px;
+    font-size:13px;
+    color: var(--text2);
+    line-height:1.5;
+  }
+  .kp-num {
+    width:20px; height:20px; border-radius:50%;
+    background: rgba(79,124,255,0.15);
+    border:1px solid rgba(79,124,255,0.2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:600; color: var(--accent);
+    flex-shrink:0;
+    font-family: var(--mono);
+  }
+  .topic-chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .topic-chip {
+    padding:5px 12px;
+    border-radius:20px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    font-size:12px;
+    color: var(--text2);
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .topic-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* QUERY PANEL */
+  .query-history { margin-bottom:20px; max-height:280px; overflow-y:auto; }
+  .query-msg {
+    margin-bottom:12px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .query-msg.user { align-items:flex-end; }
+  .query-msg.ai { align-items:flex-start; }
+  .qmsg-bubble {
+    max-width:85%;
+    padding:10px 14px;
+    border-radius:12px;
+    font-size:13px;
+    line-height:1.5;
+  }
+  .user .qmsg-bubble { background: rgba(79,124,255,0.15); border:1px solid rgba(79,124,255,0.2); color: var(--text); border-radius:12px 12px 4px 12px; }
+  .ai .qmsg-bubble { background: var(--bg3); border:1px solid var(--border); color: var(--text2); border-radius:12px 12px 12px 4px; }
+  .qmsg-time { font-size:10px; color: var(--text3); font-family: var(--mono); }
+
+  .query-input-wrap {
+    display:flex; gap:8px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 8px 8px 12px;
+    align-items:center;
+  }
+  .query-input {
+    flex:1;
+    background:none; border:none; outline:none;
+    color: var(--text);
+    font-size:13px;
+    font-family: var(--body);
+  }
+  .query-input::placeholder { color: var(--text3); }
+  .btn-send {
+    width:32px; height:32px;
+    border-radius:8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:14px;
+    transition:opacity 0.2s;
+    flex-shrink:0;
+  }
+  .btn-send:hover { opacity:0.85; }
+
+  /* SIDEBAR */
+  .sidebar { display:flex; flex-direction:column; gap:12px; }
+  .sidebar-panel {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+  }
+  .sidebar-title {
+    font-family: var(--display);
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:6px;
+    color: var(--text);
+  }
+  .sidebar-title .badge {
+    font-size:10px;
+    padding:2px 7px;
+    border-radius:10px;
+    background: rgba(0,212,168,0.1);
+    color: var(--accent3);
+    font-weight:600;
+    font-family: var(--mono);
+    border:1px solid rgba(0,212,168,0.2);
+  }
+
+  /* CHAPTERS */
+  .chapter-item {
+    display:flex; gap:10px;
+    padding:8px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background 0.2s;
+    margin-bottom:4px;
+  }
+  .chapter-item:hover { background: var(--bg3); }
+  .chapter-item.active { background: rgba(79,124,255,0.08); border:1px solid rgba(79,124,255,0.15); }
+  .chap-thumb {
+    width:52px; height:36px;
+    border-radius:6px;
+    background: var(--bg4);
+    flex-shrink:0;
+    overflow:hidden;
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+  .chap-info { flex:1; min-width:0; }
+  .chap-title { font-size:12px; font-weight:500; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .chap-time { font-size:11px; color: var(--text3); font-family: var(--mono); }
+
+  /* CLIPS */
+  .clip-card {
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px;
+    margin-bottom:8px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .clip-card:hover { border-color: var(--border2); }
+  .clip-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; }
+  .clip-title { font-size:12px; font-weight:500; flex:1; padding-right:8px; }
+  .clip-duration {
+    font-size:10px;
+    color: var(--accent3);
+    font-family: var(--mono);
+    background: rgba(0,212,168,0.1);
+    border:1px solid rgba(0,212,168,0.15);
+    padding:2px 6px;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+  .clip-tags { display:flex; gap:4px; flex-wrap:wrap; }
+  .clip-tag {
+    font-size:10px;
+    padding:2px 7px;
+    border-radius:4px;
+    background: var(--bg4);
+    color: var(--text3);
+    border:1px solid var(--border);
+  }
+
+  /* INSIGHTS PANEL */
+  .insight-item {
+    display:flex; gap:10px;
+    padding:10px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:8px;
+  }
+  .insight-icon {
+    width:28px; height:28px;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px;
+    flex-shrink:0;
+  }
+  .insight-icon.blue { background: rgba(79,124,255,0.15); }
+  .insight-icon.green { background: rgba(0,212,168,0.1); }
+  .insight-icon.amber { background: rgba(245,166,35,0.1); }
+  .insight-icon.red { background: rgba(255,107,107,0.1); }
+  .insight-text { font-size:12px; color: var(--text2); line-height:1.5; }
+  .insight-text strong { color: var(--text); font-weight:500; }
+
+  /* TIMELINE BAR */
+  .timeline-wrap {
+    margin:16px 0 0;
+  }
+  .timeline-bar {
+    height:6px;
+    background: var(--bg3);
+    border-radius:6px;
+    position:relative;
+    cursor:pointer;
+    margin-bottom:6px;
+  }
+  .tl-progress {
+    position:absolute; left:0; top:0;
+    height:100%; border-radius:6px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition:width 0.3s;
+  }
+  .tl-segment {
+    position:absolute; top:-2px;
+    height:10px;
+    border-radius:2px;
+    opacity:0.7;
+  }
+  .tl-marker {
+    position:absolute; top:-4px;
+    width:2px; height:14px;
+    border-radius:2px;
+    background: var(--accent3);
+  }
+  .tl-labels {
+    display:flex; justify-content:space-between;
+    font-size:10px; color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  /* PERSONAS / USE CASE indicator */
+  .persona-bar {
+    display:flex; gap:6px;
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 16px;
+    margin-bottom:24px;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .persona-label { font-size:12px; color: var(--text3); margin-right:4px; white-space:nowrap; }
+  .persona-chip {
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:500;
+    cursor:pointer;
+    transition:all 0.2s;
+    border:1px solid transparent;
+    background: var(--bg3);
+    color: var(--text2);
+  }
+  .persona-chip.active { background: rgba(79,124,255,0.12); border-color:rgba(79,124,255,0.3); color: var(--accent); }
+
+  /* LIBRARY PAGE */
+  .library { padding:24px 2rem; max-width:1200px; margin:0 auto; }
+  .lib-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .lib-header h2 { font-family: var(--display); font-size:22px; font-weight:700; }
+  .lib-filters { display:flex; gap:8px; flex-wrap:wrap; }
+  .filter-chip {
+    padding:5px 12px;
+    border-radius:8px;
+    background: var(--bg2);
+    border:1px solid var(--border);
+    font-size:12px;
+    color: var(--text2);
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .filter-chip.active { background: rgba(79,124,255,0.1); border-color:rgba(79,124,255,0.3); color: var(--accent); }
+  .lib-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap:16px;
+  }
+  .lib-card {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:all 0.25s;
+  }
+  .lib-card:hover { border-color: var(--border2); transform:translateY(-3px); }
+  .lib-thumb {
+    height:140px;
+    background: var(--bg3);
+    position:relative;
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lib-thumb-inner {
+    width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px;
+    position:relative;
+  }
+  .lib-thumb-bar {
+    position:absolute; bottom:0; left:0; right:0;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 10px;
+    background: rgba(10,11,14,0.7);
+    font-size:11px;
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+  .lib-card-body { padding:14px; }
+  .lib-card-title { font-size:14px; font-weight:600; margin-bottom:4px; font-family: var(--display); }
+  .lib-card-meta { font-size:12px; color: var(--text3); margin-bottom:10px; }
+  .lib-card-tags { display:flex; gap:5px; flex-wrap:wrap; }
+  .lib-tag {
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:4px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    color: var(--text3);
+  }
+  .lib-tag.ai { background: rgba(79,124,255,0.08); border-color:rgba(79,124,255,0.2); color: var(--accent); }
+  .lib-tag.training { background: rgba(0,212,168,0.07); border-color:rgba(0,212,168,0.2); color: var(--accent3); }
+  .lib-tag.tech { background: rgba(245,166,35,0.07); border-color:rgba(245,166,35,0.2); color: var(--accent5); }
+
+  /* ANALYTICS PAGE */
+  .analytics { padding:24px 2rem; max-width:1200px; margin:0 auto; }
+  .analytics h2 { font-family:var(--display); font-size:22px; font-weight:700; margin-bottom:24px; }
+  .analytics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:700px){ .analytics-grid { grid-template-columns:1fr; } }
+  .chart-panel {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+  }
+  .chart-title { font-size:13px; font-weight:600; margin-bottom:4px; font-family:var(--display); }
+  .chart-sub { font-size:12px; color: var(--text3); margin-bottom:16px; }
+
+  /* BAR CHART */
+  .bar-chart { display:flex; gap:8px; align-items:flex-end; height:120px; }
+  .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .bar-fill {
+    width:100%; border-radius:4px 4px 0 0;
+    background: linear-gradient(180deg, var(--accent2), var(--accent));
+    min-height:4px;
+    transition:height 0.5s ease;
+  }
+  .bar-fill.alt { background: linear-gradient(180deg, var(--accent3), rgba(0,212,168,0.5)); }
+  .bar-label { font-size:10px; color: var(--text3); font-family: var(--mono); text-align:center; }
+  .bar-val { font-size:11px; color: var(--text2); font-family: var(--mono); }
+
+  /* DONUT CHART */
+  .donut-wrap { display:flex; gap:20px; align-items:center; }
+  .donut-legend { flex:1; }
+  .legend-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:var(--text2); }
+  .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+  /* SPARKLINE */
+  .sparkline-row { display:flex; gap:2px; align-items:flex-end; height:50px; margin-bottom:8px; }
+  .spark-bar { flex:1; border-radius:2px 2px 0 0; background:rgba(79,124,255,0.4); min-height:3px; }
+  .spark-bar:last-child { background: var(--accent); }
+
+  /* KNOWLEDGE GRAPH / CONNECTIONS */
+  .connections-list { }
+  .conn-item {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px;
+    background: var(--bg3);
+    border-radius:8px;
+    margin-bottom:6px;
+    font-size:12px;
+    color: var(--text2);
+    cursor:pointer;
+    transition:background 0.2s;
+  }
+  .conn-item:hover { background: var(--bg4); }
+  .conn-avatar {
+    width:28px; height:28px;
+    border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px;
+    flex-shrink:0;
+  }
+  .conn-strength {
+    margin-left:auto;
+    height:4px; width:60px;
+    background: var(--bg4);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .conn-fill { height:100%; border-radius:2px; background: var(--accent); }
+
+  /* EXPORT MODAL */
+  .export-panel {
+    background: var(--bg2);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    margin-top:16px;
+  }
+  .export-option {
+    display:flex; align-items:center; gap:12px;
+    padding:12px;
+    background: var(--bg3);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:8px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .export-option:hover { border-color: var(--border2); }
+  .export-icon {
+    width:36px; height:36px;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+    flex-shrink:0;
+  }
+  .export-option h5 { font-size:13px; font-weight:500; margin-bottom:2px; }
+  .export-option p { font-size:11px; color: var(--text3); }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .page.active .dashboard, .page.active .library, .page.active .analytics {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius:4px; }
+
+  .divider { height:1px; background:var(--border); margin:16px 0; }
+
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:24px; right:24px;
+    background: var(--bg3);
+    border:1px solid var(--border2);
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:13px;
+    color: var(--text);
+    z-index:300;
+    display:flex; align-items:center; gap:10px;
+    transform:translateY(80px);
+    opacity:0;
+    transition:all 0.3s ease;
+    max-width:320px;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast-icon { font-size:16px; }
+
+  /* ANNOTATIONS */
+  .ann-item {
+    display:flex; gap:10px;
+    padding:8px 10px;
+    background:var(--bg3);
+    border-radius:8px;
+    margin-bottom:6px;
+    cursor:pointer;
+    transition:background 0.2s;
+    align-items:flex-start;
+  }
+  .ann-item:hover { background:var(--bg4); }
+  .ann-ts { font-size:10px; color:var(--accent); font-family:var(--mono); white-space:nowrap; padding-top:2px; }
+  .ann-text { font-size:12px; color:var(--text2); line-height:1.5; }
+  .ann-type {
+    font-size:10px; padding:2px 6px; border-radius:4px;
+    margin-bottom:4px; display:inline-block;
+  }
+  .ann-type.action { background:rgba(255,107,107,0.1); color:var(--accent4); border:1px solid rgba(255,107,107,0.2); }
+  .ann-type.insight { background:rgba(79,124,255,0.1); color:var(--accent); border:1px solid rgba(79,124,255,0.2); }
+  .ann-type.bookmark { background:rgba(245,166,35,0.1); color:var(--accent5); border:1px solid rgba(245,166,35,0.2); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Video<span>IQ</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('upload')">Analyze</button>
+    <button class="nav-tab" onclick="showPage('dashboard')">Insights</button>
+    <button class="nav-tab" onclick="showPage('library')">Library</button>
+    <button class="nav-tab" onclick="showPage('analytics')">Analytics</button>
+  </div>
+  <div class="nav-right">
+    <div class="badge-live"><div class="dot-live"></div>AI Ready</div>
+  </div>
+</nav>
+
+<!-- ===================== UPLOAD / ANALYZE PAGE ===================== -->
+<div class="page active" id="page-upload">
+  <div class="hero">
+    <div class="hero-badge">⚡ Powered by Claude + Whisper + LangGraph</div>
+    <h1>Turn recordings into<br><em>actionable intelligence</em></h1>
+    <p>Search, query, and reuse knowledge from training sessions, tech talks, onboarding recordings, and team meetings — instantly.</p>
+
+    <div class="upload-zone" id="uploadZone" onclick="startAnalysis()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')">
+      <div class="upload-icon">🎬</div>
+      <h3>Drop your video or click to upload</h3>
+      <p>Supports recordings from Zoom, Meet, Teams, Loom, and local files</p>
+      <div class="upload-formats">
+        <span class="fmt-tag">.mp4</span><span class="fmt-tag">.mov</span><span class="fmt-tag">.webm</span>
+        <span class="fmt-tag">.mkv</span><span class="fmt-tag">.avi</span><span class="fmt-tag">YouTube URL</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:32px; text-align:left; max-width:100%;">
+      <p class="section-title">Choose your use case</p>
+      <div class="use-case-grid">
+        <div class="use-case-card selected" onclick="selectUseCase(this)">
+          <span class="uc-icon">🏫</span>
+          <div class="uc-title">Training & L&D</div>
+          <div class="uc-desc">Extract learning objectives, quiz questions, and completion summaries</div>
+        </div>
+        <div class="use-case-card" onclick="selectUseCase(this)">
+          <span class="uc-icon">🔬</span>
+          <div class="uc-title">Tech Talks</div>
+          <div class="uc-desc">Capture architecture decisions, code snippets, and tech references</div>
+        </div>
+        <div class="use-case-card" onclick="selectUseCase(this)">
+          <span class="uc-icon">🤝</span>
+          <div class="uc-title">Onboarding</div>
+          <div class="uc-desc">Build searchable SOPs, process docs, and role-specific knowledge bases</div>
+        </div>
+        <div class="use-case-card" onclick="selectUseCase(this)">
+          <span class="uc-icon">📋</span>
+          <div class="uc-title">Team Meetings</div>
+          <div class="uc-desc">Auto-extract action items, decisions, and follow-ups with owners</div>
+        </div>
+        <div class="use-case-card" onclick="selectUseCase(this)">
+          <span class="uc-icon">🎯</span>
+          <div class="uc-title">Sales Calls</div>
+          <div class="uc-desc">Identify objections, product feedback, and deal-advancing commitments</div>
+        </div>
+        <div class="use-case-card" onclick="selectUseCase(this)">
+          <span class="uc-icon">🧠</span>
+          <div class="uc-title">Research Interviews</div>
+          <div class="uc-desc">Theme clustering, sentiment tracking, and insight synthesis across sessions</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="startAnalysis()">🚀 Analyze Video</button>
+        <button class="btn-secondary" onclick="showPage('dashboard')">👀 View Demo Results</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROCESSING OVERLAY ===================== -->
+<div class="processing-overlay" id="processingOverlay">
+  <div class="process-box">
+    <div class="process-title">Analyzing your video</div>
+    <div class="process-sub" id="processFilename">team-all-hands-q2.mp4 · 47:23</div>
+    <div class="pipeline-steps" id="pipelineSteps">
+      <div class="pipe-step active" id="step-validate">
+        <div class="pipe-icon">⟳</div><span>Validating & extracting metadata</span>
+      </div>
+      <div class="pipe-step" id="step-audio">
+        <div class="pipe-icon">◦</div><span>Extracting audio track</span>
+      </div>
+      <div class="pipe-step" id="step-transcribe">
+        <div class="pipe-icon">◦</div><span>Transcribing with Whisper</span>
+      </div>
+      <div class="pipe-step" id="step-frames">
+        <div class="pipe-icon">◦</div><span>Extracting key frames</span>
+      </div>
+      <div class="pipe-step" id="step-analyze">
+        <div class="pipe-icon">◦</div><span>Analyzing with Claude AI</span>
+      </div>
+      <div class="pipe-step" id="step-insights">
+        <div class="pipe-icon">◦</div><span>Generating insights & clips</span>
+      </div>
+      <div class="pipe-step" id="step-index">
+        <div class="pipe-icon">◦</div><span>Building search index</span>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD PAGE ===================== -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard">
+    <div class="persona-bar">
+      <span class="persona-label">Viewing as:</span>
+      <span class="persona-chip active" onclick="switchPersona(this,'all')">All Roles</span>
+      <span class="persona-chip" onclick="switchPersona(this,'dev')">👨‍💻 Developer</span>
+      <span class="persona-chip" onclick="switchPersona(this,'hr')">👥 L&D / HR</span>
+      <span class="persona-chip" onclick="switchPersona(this,'manager')">📊 Manager</span>
+      <span class="persona-chip" onclick="switchPersona(this,'new')">🌱 New Hire</span>
+    </div>
+
+    <div class="dash-header">
+      <div class="video-title-block">
+        <h2>Engineering All-Hands — Q2 Roadmap & Platform Architecture</h2>
+        <div class="video-meta-tags">
+          <span class="meta-tag type">🔬 Tech Talk</span>
+          <span class="meta-tag">⏱ 47:23</span>
+          <span class="meta-tag">📅 May 14, 2026</span>
+          <span class="meta-tag">👤 23 attendees</span>
+          <span class="meta-tag">🎙 Sarah Chen (host)</span>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-icon accent" onclick="showExport()">📤 Export</button>
+        <button class="btn-icon" onclick="showToast('🔗 Share link copied!','Shareable link with access controls')">🔗 Share</button>
+        <button class="btn-icon" onclick="showToast('🔔 Subscribed!','You\'ll get notified of new sessions')">🔔 Subscribe</button>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card accent">
+        <div class="stat-label">Key Topics</div>
+        <div class="stat-val">12</div>
+        <div class="stat-sub">detected by AI</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Action Items</div>
+        <div class="stat-val">8</div>
+        <div class="stat-sub">with owners assigned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Smart Clips</div>
+        <div class="stat-val">6</div>
+        <div class="stat-sub">shareable highlights</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Searchable Words</div>
+        <div class="stat-val">9.4k</div>
+        <div class="stat-sub">full transcript</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reading Time</div>
+        <div class="stat-val">4m</div>
+        <div class="stat-sub">vs 47m to watch</div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="panel" style="margin-bottom:16px; padding:16px 20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:13px;font-weight:600;font-family:var(--display);">Session Timeline</span>
+        <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">Click to jump to any chapter</span>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline-bar" id="timelineBar" onclick="handleTimelineClick(event)">
+          <div class="tl-progress" id="tlProgress" style="width:35%"></div>
+          <div class="tl-segment" style="left:0%;width:18%;background:rgba(79,124,255,0.3);"></div>
+          <div class="tl-segment" style="left:19%;width:15%;background:rgba(0,212,168,0.3);"></div>
+          <div class="tl-segment" style="left:35%;width:20%;background:rgba(245,166,35,0.3);"></div>
+          <div class="tl-segment" style="left:56%;width:25%;background:rgba(123,93,250,0.3);"></div>
+          <div class="tl-segment" style="left:82%;width:18%;background:rgba(255,107,107,0.3);"></div>
+          <div class="tl-marker" style="left:22%"></div>
+          <div class="tl-marker" style="left:55%" style="background:var(--accent5)"></div>
+        </div>
+        <div class="tl-labels">
+          <span>0:00</span><span>Intro</span><span>Architecture</span><span>Roadmap</span><span>Q&A</span><span>47:23</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- MAIN PANEL -->
+      <div>
+        <div class="panel">
+          <div class="panel-tabs">
+            <button class="panel-tab active" onclick="switchTab(this,'summary')">📝 Summary</button>
+            <button class="panel-tab" onclick="switchTab(this,'transcript')">📄 Transcript</button>
+            <button class="panel-tab" onclick="switchTab(this,'query')">💬 Ask AI</button>
+            <button class="panel-tab" onclick="switchTab(this,'actions')">✅ Action Items</button>
+            <button class="panel-tab" onclick="switchTab(this,'annotations')">📌 Annotations</button>
+          </div>
+          <div class="panel-content">
+            <!-- SUMMARY -->
+            <div class="panel-pane active" id="pane-summary">
+              <div class="summary-section">
+                <h4>TL;DR — 30-second summary</h4>
+                <div class="summary-text">Sarah Chen kicked off the Q2 All-Hands by unveiling the new microservices migration plan, targeting a full transition by July. The team debated the tradeoffs of an event-driven architecture, settled on Kafka for the messaging layer, and committed to a phased rollout beginning with the payments service. Eight concrete action items were assigned across engineering leads.</div>
+              </div>
+              <div class="summary-section">
+                <h4>Key Takeaways</h4>
+                <div class="key-point"><div class="kp-num">1</div>Migration to microservices will be complete by end of Q2, starting with payments service as the pilot workload</div>
+                <div class="key-point"><div class="kp-num">2</div>Kafka selected as event streaming backbone; RabbitMQ ruled out due to throughput limitations at projected scale</div>
+                <div class="key-point"><div class="kp-num">3</div>New API gateway will enforce rate-limiting and auth centrally, eliminating per-service duplication</div>
+                <div class="key-point"><div class="kp-num">4</div>On-call rotation revised — each squad takes a 2-week rotation instead of 1-week to reduce burnout</div>
+                <div class="key-point"><div class="kp-num">5</div>Engineering hiring: 4 senior SWE and 1 SRE slots approved for Q3, JDs to go live by June 1</div>
+              </div>
+              <div class="summary-section">
+                <h4>Topics Covered</h4>
+                <div class="topic-chips">
+                  <span class="topic-chip">Microservices</span>
+                  <span class="topic-chip">Kafka</span>
+                  <span class="topic-chip">API Gateway</span>
+                  <span class="topic-chip">Payments Service</span>
+                  <span class="topic-chip">On-call</span>
+                  <span class="topic-chip">Hiring</span>
+                  <span class="topic-chip">Q2 Roadmap</span>
+                  <span class="topic-chip">Event-driven Arch</span>
+                  <span class="topic-chip">SRE</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TRANSCRIPT -->
+            <div class="panel-pane" id="pane-transcript">
+              <div class="transcript-search">
+                <input class="search-input" placeholder="Search transcript... (try 'kafka', 'payments', 'deadline')" id="transcriptSearch" oninput="searchTranscript(this.value)">
+                <button class="btn-secondary" style="padding:8px 12px;font-size:12px;" onclick="showToast('📋 Copied!','Full transcript copied to clipboard')">Copy All</button>
+              </div>
+              <div id="transcriptContent">
+                <div class="transcript-block" onclick="jumpTo(0)">
+                  <span class="ts-time">0:00</span>
+                  <div class="ts-text">Alright, good morning everyone. Thanks for joining. We've got a packed agenda today — we're going to go through the Q2 roadmap, talk through the architecture decisions we landed on last week, and then open it up for questions.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(180)">
+                  <span class="ts-time">3:00</span>
+                  <div class="ts-text">So the big headline: we're moving to a microservices architecture. I know we've talked about this for a while, but we have executive sign-off, a dedicated migration squad, and a hard deadline of July 31st for the pilot service.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(420)">
+                  <span class="ts-time">7:00</span>
+                  <div class="ts-text">We evaluated three messaging systems — RabbitMQ, Kafka, and Pulsar. After benchmarking at 10x our projected peak load, Kafka was the clear winner. RabbitMQ hit throughput limits at around 80k messages per second, which we'd blow past in 18 months.</div>
+                </div>
+                <div class="transcript-block highlighted" onclick="jumpTo(600)">
+                  <span class="ts-time">10:00</span>
+                  <div class="ts-text">The payments service is our pilot for microservices migration. It's relatively self-contained, has clear API boundaries, and the team has already written specs for the event schema. If we can migrate payments cleanly, we have a proven playbook for the rest.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(840)">
+                  <span class="ts-time">14:00</span>
+                  <div class="ts-text">On the API gateway — we're going with Kong. It'll handle auth, rate-limiting, and request routing centrally. Every service that's currently doing its own JWT validation will delegate to the gateway. That's about 30% of our auth code we can delete.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(1620)">
+                  <span class="ts-time">27:00</span>
+                  <div class="ts-text">For on-call, we heard the feedback clearly. 1-week rotations are burning people out. Starting June 1st, we're switching to 2-week rotations with a mandatory recovery week before you go on-call again. We're also adding a shadow rotation for folks who are new to the system.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(2400)">
+                  <span class="ts-time">40:00</span>
+                  <div class="ts-text">Q&A is open. I'll take questions — go ahead Marcus.</div>
+                </div>
+                <div class="transcript-block" onclick="jumpTo(2500)">
+                  <span class="ts-time">41:40</span>
+                  <div class="ts-text">Marcus: What's the fallback plan if the payments migration hits delays? Are we committed to July 31 as a hard date? Sarah: It's a target, not a contract. If we're not confident by July 15th, we push to mid-August. Customer-facing reliability comes first.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ASK AI -->
+            <div class="panel-pane" id="pane-query">
+              <div style="margin-bottom:12px;">
+                <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Ask anything about this recording. Try:</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+                  <button class="topic-chip" onclick="askSuggestion('What were the main technical decisions made?')">Technical decisions</button>
+                  <button class="topic-chip" onclick="askSuggestion('Who owns each action item?')">Action item owners</button>
+                  <button class="topic-chip" onclick="askSuggestion('What are the risks of the migration?')">Migration risks</button>
+                  <button class="topic-chip" onclick="askSuggestion('Summarize the Q&A section')">Q&A highlights</button>
+                  <button class="topic-chip" onclick="askSuggestion('What should a new engineer know from this?')">New hire view</button>
+                </div>
+              </div>
+              <div class="query-history" id="queryHistory">
+                <div class="query-msg ai">
+                  <div class="qmsg-bubble">👋 Hi! I've analyzed this 47-minute recording. Ask me anything — I can find specific moments, summarize decisions, extract action items, or explain concepts discussed in the session.</div>
+                  <span class="qmsg-time">ready</span>
+                </div>
+              </div>
+              <div class="query-input-wrap">
+                <input class="query-input" placeholder="Ask about this video..." id="queryInput" onkeydown="if(event.key==='Enter')sendQuery()">
+                <button class="btn-send" onclick="sendQuery()">→</button>
+              </div>
+            </div>
+
+            <!-- ACTION ITEMS -->
+            <div class="panel-pane" id="pane-actions">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <span style="font-size:13px;color:var(--text2);">8 action items extracted by AI from the recording</span>
+                <button class="btn-secondary" style="font-size:12px;padding:6px 12px;" onclick="showToast('📤 Exported!','Action items sent to Jira & Notion')">Export to Jira</button>
+              </div>
+              <div id="actionItems">
+                <div class="clip-card" onclick="jumpToAction(600)">
+                  <div class="clip-header">
+                    <div class="clip-title">⚡ <strong>Alex:</strong> Finalize Kafka topic schema for payments service event stream</div>
+                    <div class="clip-duration">10:00</div>
+                  </div>
+                  <div class="clip-tags">
+                    <span class="clip-tag">Payments</span><span class="clip-tag">Alex M.</span><span class="clip-tag" style="color:var(--accent4);border-color:rgba(255,107,107,0.3);">Due Jun 7</span>
+                  </div>
+                </div>
+                <div class="clip-card" onclick="jumpToAction(840)">
+                  <div class="clip-header">
+                    <div class="clip-title">⚡ <strong>DevOps:</strong> Set up Kong API gateway in staging with auth middleware</div>
+                    <div class="clip-duration">14:00</div>
+                  </div>
+                  <div class="clip-tags">
+                    <span class="clip-tag">Infrastructure</span><span class="clip-tag">DevOps Team</span><span class="clip-tag" style="color:var(--accent5);border-color:rgba(245,166,35,0.3);">Due Jun 14</span>
+                  </div>
+                </div>
+                <div class="clip-card" onclick="jumpToAction(1620)">
+                  <div class="clip-header">
+                    <div class="clip-title">⚡ <strong>Sarah:</strong> Update on-call schedule in PagerDuty to 2-week rotations</div>
+                    <div class="clip-duration">27:00</div>
+                  </div>
+                  <div class="clip-tags">
+                    <span class="clip-tag">Process</span><span class="clip-tag">Sarah C.</span><span class="clip-tag" style="color:var(--accent3);border-color:rgba(0,212,168,0.3);">Done</span>
+                  </div>
+                </div>
+                <div class="clip-card" onclick="jumpToAction(1800)">
+                  <div class="clip-header">
+                    <div class="clip-title">⚡ <strong>Recruiting:</strong> Post 4 Senior SWE and 1 SRE job descriptions by June 1</div>
+                    <div class="clip-duration">30:00</div>
+                  </div>
+                  <div class="clip-tags">
+                    <span class="clip-tag">Hiring</span><span class="clip-tag">Priya R.</span><span class="clip-tag" style="color:var(--accent4);border-color:rgba(255,107,107,0.3);">Due Jun 1</span>
+                  </div>
+                </div>
+                <div class="clip-card">
+                  <div class="clip-header">
+                    <div class="clip-title">⚡ <strong>Leads:</strong> Write migration runbooks for each service team by June 20</div>
+                    <div class="clip-duration">35:00</div>
+                  </div>
+                  <div class="clip-tags">
+                    <span class="clip-tag">Documentation</span><span class="clip-tag">All Leads</span><span class="clip-tag" style="color:var(--accent4);border-color:rgba(255,107,107,0.3);">Due Jun 20</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ANNOTATIONS -->
+            <div class="panel-pane" id="pane-annotations">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <span style="font-size:13px;color:var(--text2);">AI-detected + team annotations</span>
+                <button class="btn-secondary" style="font-size:12px;padding:6px 12px;" onclick="showToast('📌 Annotation added','Bookmark saved at current position')">+ Add Note</button>
+              </div>
+              <div class="ann-item">
+                <span class="ann-ts">3:00</span>
+                <div>
+                  <span class="ann-type insight">🤖 AI Insight</span>
+                  <div class="ann-text">Decision point: Microservices migration officially approved. This reverses the Q4 2025 decision to stay monolithic. Key context for any future architecture discussions.</div>
+                </div>
+              </div>
+              <div class="ann-item">
+                <span class="ann-ts">7:00</span>
+                <div>
+                  <span class="ann-type insight">🤖 AI Insight</span>
+                  <div class="ann-text">Technical decision: Kafka selected over RabbitMQ and Pulsar. Performance benchmarks at 80k msg/sec were the deciding factor. Link to benchmark doc mentioned but not shared in session.</div>
+                </div>
+              </div>
+              <div class="ann-item">
+                <span class="ann-ts">10:00</span>
+                <div>
+                  <span class="ann-type action">❗ Action Required</span>
+                  <div class="ann-text">Payments service is the migration pilot. Deadline July 31st (soft). Teams should review their dependencies on payments service before migration begins.</div>
+                </div>
+              </div>
+              <div class="ann-item">
+                <span class="ann-ts">27:00</span>
+                <div>
+                  <span class="ann-type bookmark">🔖 Team Bookmark</span>
+                  <div class="ann-text">Marcus (Platform Lead): Important on-call policy change. Share with new engineers who joined after May — they missed this context.</div>
+                </div>
+              </div>
+              <div class="ann-item">
+                <span class="ann-ts">41:40</span>
+                <div>
+                  <span class="ann-type insight">🤖 AI Insight</span>
+                  <div class="ann-text">Risk mitigation discussed: July 31 is a target, not hard deadline. Decision gate on July 15. This is important context if timelines slip in planning tools.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <!-- CHAPTERS -->
+        <div class="sidebar-panel">
+          <div class="sidebar-title">🎬 Auto Chapters <span class="badge">AI</span></div>
+          <div class="chapter-item active" onclick="jumpTo(0)">
+            <div class="chap-thumb">0:00</div>
+            <div class="chap-info">
+              <div class="chap-title">Intro & Agenda</div>
+              <div class="chap-time">0:00 – 3:00 · 3 min</div>
+            </div>
+          </div>
+          <div class="chapter-item" onclick="jumpTo(180)">
+            <div class="chap-thumb">3:00</div>
+            <div class="chap-info">
+              <div class="chap-title">Migration Decision</div>
+              <div class="chap-time">3:00 – 10:30 · 7 min</div>
+            </div>
+          </div>
+          <div class="chapter-item" onclick="jumpTo(630)">
+            <div class="chap-thumb">10:30</div>
+            <div class="chap-info">
+              <div class="chap-title">Architecture: Kafka & Gateway</div>
+              <div class="chap-time">10:30 – 26:00 · 16 min</div>
+            </div>
+          </div>
+          <div class="chapter-item" onclick="jumpTo(1560)">
+            <div class="chap-thumb">26:00</div>
+            <div class="chap-info">
+              <div class="chap-title">Q2 Roadmap & Hiring</div>
+              <div class="chap-time">26:00 – 38:00 · 12 min</div>
+            </div>
+          </div>
+          <div class="chapter-item" onclick="jumpTo(2280)">
+            <div class="chap-thumb">38:00</div>
+            <div class="chap-info">
+              <div class="chap-title">Q&A Session</div>
+              <div class="chap-time">38:00 – 47:23 · 9 min</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SMART CLIPS -->
+        <div class="sidebar-panel">
+          <div class="sidebar-title">✂️ Smart Clips <span class="badge">6</span></div>
+          <div class="clip-card">
+            <div class="clip-header">
+              <div class="clip-title">Why we chose Kafka</div>
+              <div class="clip-duration">2:15</div>
+            </div>
+            <div class="clip-tags">
+              <span class="clip-tag">Architecture</span><span class="clip-tag lib-tag tech">Decision</span>
+            </div>
+          </div>
+          <div class="clip-card">
+            <div class="clip-header">
+              <div class="clip-title">Payments migration plan</div>
+              <div class="clip-duration">3:40</div>
+            </div>
+            <div class="clip-tags">
+              <span class="clip-tag">Migration</span><span class="clip-tag lib-tag training">Onboarding</span>
+            </div>
+          </div>
+          <div class="clip-card">
+            <div class="clip-header">
+              <div class="clip-title">New on-call policy explained</div>
+              <div class="clip-duration">1:55</div>
+            </div>
+            <div class="clip-tags">
+              <span class="clip-tag">Process</span><span class="clip-tag lib-tag training">Policy</span>
+            </div>
+          </div>
+          <button class="btn-secondary" style="width:100%;font-size:12px;margin-top:6px;" onclick="showToast('✂️ Generating clips','AI is extracting 3 more shareable moments')">Generate More Clips</button>
+        </div>
+
+        <!-- AI INSIGHTS -->
+        <div class="sidebar-panel">
+          <div class="sidebar-title">💡 AI Insights</div>
+          <div class="insight-item">
+            <div class="insight-icon blue">🏗</div>
+            <div class="insight-text"><strong>Architecture shift</strong> — This session documents a major platform decision. Tag for engineering onboarding path.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon amber">⚠️</div>
+            <div class="insight-text"><strong>Deadline risk flagged</strong> — July 31 mentioned as soft. Consider tracking milestone formally.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon green">📈</div>
+            <div class="insight-text"><strong>High knowledge density</strong> — 9 distinct technical topics in 47 min. Recommend splitting into topic playlists.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-icon red">🔗</div>
+            <div class="insight-text"><strong>Missing resource</strong> — Kafka benchmark doc referenced but not shared. AI couldn't locate it in linked materials.</div>
+          </div>
+        </div>
+
+        <!-- RELATED -->
+        <div class="sidebar-panel">
+          <div class="sidebar-title">🔗 Related Sessions</div>
+          <div class="connections-list">
+            <div class="conn-item" onclick="showToast('📂 Opening...','Microservices Design Review (Apr 28)')">
+              <div class="conn-avatar" style="background:rgba(79,124,255,0.12);font-size:14px;">🔬</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Microservices Design Review</div>
+                <div style="font-size:10px;color:var(--text3);">Apr 28 · 52 min</div>
+              </div>
+              <div class="conn-strength"><div class="conn-fill" style="width:88%"></div></div>
+            </div>
+            <div class="conn-item" onclick="showToast('📂 Opening...','Payments Service Kickoff (Mar 10)')">
+              <div class="conn-avatar" style="background:rgba(0,212,168,0.1);font-size:14px;">💳</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Payments Service Kickoff</div>
+                <div style="font-size:10px;color:var(--text3);">Mar 10 · 38 min</div>
+              </div>
+              <div class="conn-strength"><div class="conn-fill" style="width:72%;background:var(--accent3)"></div></div>
+            </div>
+            <div class="conn-item" onclick="showToast('📂 Opening...','SRE On-call Process (Feb 2)')">
+              <div class="conn-avatar" style="background:rgba(245,166,35,0.1);font-size:14px;">🚨</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">SRE On-call Process Retro</div>
+                <div style="font-size:10px;color:var(--text3);">Feb 2 · 29 min</div>
+              </div>
+              <div class="conn-strength"><div class="conn-fill" style="width:65%;background:var(--accent5)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LIBRARY PAGE ===================== -->
+<div class="page" id="page-library">
+  <div class="library">
+    <div class="lib-header">
+      <h2>Knowledge Library</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="search-input" style="width:220px;" placeholder="🔍 Search across all recordings...">
+        <button class="btn-primary" style="font-size:13px;padding:8px 16px;" onclick="showPage('upload')">+ Upload</button>
+      </div>
+    </div>
+    <div class="lib-filters" style="margin-bottom:20px;">
+      <span class="filter-chip active" onclick="toggleFilter(this)">All</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">🔬 Tech Talks</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">🏫 Training</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">🤝 Onboarding</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">📋 Meetings</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">✅ Has Action Items</span>
+      <span class="filter-chip" onclick="toggleFilter(this)">📅 This Month</span>
+    </div>
+    <div class="lib-grid">
+      <div class="lib-card" onclick="showPage('dashboard')">
+        <div class="lib-thumb">
+          <div class="lib-thumb-inner" style="background:linear-gradient(135deg,rgba(79,124,255,0.15),rgba(123,93,250,0.1))">🏗</div>
+          <div class="lib-thumb-bar"><span>Q2 All-Hands</span><span>47:23</span></div>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-title">Engineering All-Hands — Q2 Roadmap</div>
+          <div class="lib-card-meta">May 14, 2026 · Sarah Chen · 23 attendees</div>
+          <div class="lib-card-tags"><span class="lib-tag tech">🔬 Tech Talk</span><span class="lib-tag">8 actions</span><span class="lib-tag ai">AI analyzed</span></div>
+        </div>
+      </div>
+      <div class="lib-card">
+        <div class="lib-thumb">
+          <div class="lib-thumb-inner" style="background:linear-gradient(135deg,rgba(0,212,168,0.12),rgba(0,212,168,0.05))">🐍</div>
+          <div class="lib-thumb-bar"><span>Python for Data Eng</span><span>1:22:10</span></div>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-title">Python for Data Engineering — Module 3</div>
+          <div class="lib-card-meta">May 10, 2026 · L&D Team · Self-paced</div>
+          <div class="lib-card-tags"><span class="lib-tag training">🏫 Training</span><span class="lib-tag">12 quiz Qs</span><span class="lib-tag ai">AI analyzed</span></div>
+        </div>
+      </div>
+      <div class="lib-card">
+        <div class="lib-thumb">
+          <div class="lib-thumb-inner" style="background:linear-gradient(135deg,rgba(245,166,35,0.12),rgba(245,166,35,0.05))">🤝</div>
+          <div class="lib-thumb-bar"><span>Onboarding Day 1</span><span>55:00</span></div>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-title">New Hire Onboarding — Engineering Track</div>
+          <div class="lib-card-meta">May 5, 2026 · People Ops · 6 new hires</div>
+          <div class="lib-card-tags"><span class="lib-tag training">🤝 Onboarding</span><span class="lib-tag">Process docs</span><span class="lib-tag ai">AI analyzed</span></div>
+        </div>
+      </div>
+      <div class="lib-card">
+        <div class="lib-thumb">
+          <div class="lib-thumb-inner" style="background:linear-gradient(135deg,rgba(255,107,107,0.12),rgba(255,107,107,0.05))">🎯</div>
+          <div class="lib-thumb-bar"><span>Sales Demo</span><span>28:45</span></div>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-title">Enterprise Sales Demo — Acme Corp</div>
+          <div class="lib-card-meta">May 12, 2026 · Sales Team · 5 attendees</div>
+          <div class="lib-card-tags"><span class="lib-tag" style="color:var(--accent4);border-color:rgba(255,107,107,0.3);">🎯 Sales</span><span class="lib-tag">3 objections</span><span class="lib-tag ai">AI analyzed</span></div>
+        </div>
+      </div>
+      <div class="lib-card">
+        <div class="lib-thumb">
+          <div class="lib-thumb-inner" style="background:linear-gradient(135deg,rgba(123,93,250,0.15),rgba(79,124,255,0.08))">🔒</div>
+          <div class="lib-thumb-bar"><span>Security Review</span><span>41:00</span></div>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-title">Security Architecture Review — Auth Service</div>
+          <div class="lib-card-meta">May 8, 2026 · Platform Team · 8 engineers</div>
+          <div class="lib-card-tags"><span class="lib-tag tech">🔬 Tech Talk</span><span class="lib-tag">5 actions</span><span class="lib-tag ai">AI analyzed</span></div>
+        </div>
+      </div>
+      <div class="lib-card" style="border-style:dashed;cursor:default;display:flex;align-items:center;justify-content:center;min-height:220px;" onclick="showPage('upload')">
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:32px;margin-bottom:10px;opacity:0.4;">+</div>
+          <div style="font-size:13px;color:var(--text3);">Upload a recording</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ANALYTICS PAGE ===================== -->
+<div class="page" id="page-analytics">
+  <div class="analytics">
+    <h2>Knowledge Analytics</h2>
+    <div class="stat-row" style="margin-bottom:24px;">
+      <div class="stat-card accent">
+        <div class="stat-label">Total Sessions</div>
+        <div class="stat-val">47</div>
+        <div class="stat-sub">across 5 categories</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Hours Indexed</div>
+        <div class="stat-val">138h</div>
+        <div class="stat-sub">of searchable knowledge</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Searches / Week</div>
+        <div class="stat-val">2.1k</div>
+        <div class="stat-sub">↑ 34% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Actions Completed</div>
+        <div class="stat-val">73%</div>
+        <div class="stat-sub">of extracted items</div>
+      </div>
+    </div>
+    <div class="analytics-grid">
+      <div class="chart-panel">
+        <div class="chart-title">Recordings by Use Case</div>
+        <div class="chart-sub">Sessions analyzed this month</div>
+        <div class="bar-chart">
+          <div class="bar-col"><div class="bar-fill" style="height:90px"></div><div class="bar-val">18</div><div class="bar-label">Tech Talks</div></div>
+          <div class="bar-col"><div class="bar-fill" style="height:65px"></div><div class="bar-val">13</div><div class="bar-label">Training</div></div>
+          <div class="bar-col"><div class="bar-fill alt" style="height:40px"></div><div class="bar-val">8</div><div class="bar-label">Onboarding</div></div>
+          <div class="bar-col"><div class="bar-fill" style="height:55px;background:linear-gradient(180deg,rgba(245,166,35,0.9),rgba(245,166,35,0.5))"></div><div class="bar-val">11</div><div class="bar-label">Meetings</div></div>
+          <div class="bar-col"><div class="bar-fill" style="height:30px;background:linear-gradient(180deg,rgba(255,107,107,0.9),rgba(255,107,107,0.5))"></div><div class="bar-val">6</div><div class="bar-label">Sales</div></div>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">Weekly Search Volume</div>
+        <div class="chart-sub">Queries across knowledge base</div>
+        <div class="sparkline-row">
+          <div class="spark-bar" style="height:60%"></div>
+          <div class="spark-bar" style="height:45%"></div>
+          <div class="spark-bar" style="height:70%"></div>
+          <div class="spark-bar" style="height:55%"></div>
+          <div class="spark-bar" style="height:80%"></div>
+          <div class="spark-bar" style="height:65%"></div>
+          <div class="spark-bar" style="height:90%"></div>
+          <div class="spark-bar" style="height:75%"></div>
+          <div class="spark-bar" style="height:85%"></div>
+          <div class="spark-bar" style="height:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);">
+          <span>Mar</span><span>Apr</span><span>May</span><span>Now</span>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div><div style="font-size:10px;color:var(--text3)">Avg session</div><div style="font-size:18px;font-weight:600;font-family:var(--display);color:var(--accent)">47m</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Avg saved vs watching</div><div style="font-size:18px;font-weight:600;font-family:var(--display);color:var(--accent3)">91%</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Top query</div><div style="font-size:13px;font-weight:500;font-family:var(--mono);margin-top:4px;">"kafka setup"</div></div>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">Top Topics Searched</div>
+        <div class="chart-sub">Cross-session knowledge gaps</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text2);min-width:120px;">Microservices</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:85%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px"></div></div>
+            <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:30px">342</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text2);min-width:120px;">On-call policy</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:64%;background:linear-gradient(90deg,var(--accent3),rgba(0,212,168,0.5));border-radius:4px"></div></div>
+            <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:30px">258</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text2);min-width:120px;">Kafka setup</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:55%;background:linear-gradient(90deg,var(--accent2),rgba(123,93,250,0.5));border-radius:4px"></div></div>
+            <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:30px">221</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text2);min-width:120px;">API Gateway</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:40%;background:linear-gradient(90deg,var(--accent5),rgba(245,166,35,0.5));border-radius:4px"></div></div>
+            <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:30px">162</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:12px;color:var(--text2);min-width:120px;">Hiring process</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;"><div style="height:100%;width:28%;background:linear-gradient(90deg,var(--accent4),rgba(255,107,107,0.5));border-radius:4px"></div></div>
+            <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:30px">113</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title">Knowledge Reuse Rate</div>
+        <div class="chart-sub">Sessions referenced after initial view</div>
+        <div class="donut-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#4f7cff" stroke-width="14" stroke-dasharray="153 86" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#00d4a8" stroke-width="14" stroke-dasharray="48 191" stroke-dashoffset="-153" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#f5a623" stroke-width="14" stroke-dasharray="38 201" stroke-dashoffset="-201" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+            <text x="50" y="54" text-anchor="middle" fill="#f0f2f7" font-size="14" font-weight="600" font-family="Syne,sans-serif">64%</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Re-searched (64%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent3)"></div>Shared (20%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent5)"></div>Clipped & reused (16%)</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.5;">↑ Reuse rate up 18% since implementing Smart Clips. Onboarding sessions have the highest reuse at 89%.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <div>
+    <div id="toastMsg" style="font-weight:500"></div>
+    <div id="toastSub" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+  </div>
+</div>
+
+<script>
+// PAGE NAVIGATION
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const tabMap = {upload:'Analyze',dashboard:'Insights',library:'Library',analytics:'Analytics'};
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if(t.textContent.trim() === tabMap[name]) t.classList.add('active');
+  });
+}
+
+// PANEL TABS
+function switchTab(btn, pane) {
+  btn.closest('.panel-tabs').querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.panel').querySelectorAll('.panel-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('pane-' + pane).classList.add('active');
+}
+
+// USE CASE SELECTION
+function selectUseCase(card) {
+  document.querySelectorAll('.use-case-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+// PERSONA
+function switchPersona(chip, persona) {
+  document.querySelectorAll('.persona-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  const msgs = {
+    all: 'Showing all insights', dev: 'Filtered for developers — code snippets and architecture decisions highlighted',
+    hr: 'Filtered for L&D — learning objectives and quiz questions surfaced',
+    manager: 'Filtered for managers — action items, decisions, and risks prioritized',
+    new: 'New hire view — foundational concepts and glossary terms highlighted'
+  };
+  showToast('👤 ' + chip.textContent, msgs[persona]);
+}
+
+// PROCESSING ANIMATION
+function startAnalysis() {
+  document.getElementById('processingOverlay').classList.add('show');
+  const steps = ['validate','audio','transcribe','frames','analyze','insights','index'];
+  const weights = [5,10,35,10,20,10,10];
+  let cumulative = 0;
+  let i = 0;
+  function doStep() {
+    if(i > 0) {
+      const prev = document.getElementById('step-'+steps[i-1]);
+      prev.classList.remove('active');
+      prev.classList.add('done');
+      prev.querySelector('.pipe-icon').textContent = '✓';
+    }
+    if(i < steps.length) {
+      document.getElementById('step-'+steps[i]).classList.add('active');
+      document.getElementById('step-'+steps[i]).querySelector('.pipe-icon').textContent = '⟳';
+      cumulative += weights[i];
+      document.getElementById('progressFill').style.width = cumulative + '%';
+      i++;
+      setTimeout(doStep, 600 + Math.random()*400);
+    } else {
+      document.getElementById('progressFill').style.width = '100%';
+      setTimeout(() => {
+        document.getElementById('processingOverlay').classList.remove('show');
+        showPage('dashboard');
+        showToast('✅ Analysis complete!', 'Engineering All-Hands · 47:23 · 8 actions extracted');
+      }, 800);
+    }
+  }
+  doStep();
+}
+
+// AI QUERY
+const aiResponses = {
+  'technical decisions': 'Three major technical decisions were made: (1) **Kafka** selected as event streaming backbone over RabbitMQ — throughput at scale was decisive (7:00). (2) **Kong API Gateway** chosen to centralize auth and rate-limiting (14:00). (3) **Payments service** chosen as migration pilot due to clear API boundaries (10:00).',
+  'action item': 'There are **8 action items** total. Key owners: Alex M. → Kafka schema (due Jun 7), DevOps Team → Kong staging setup (due Jun 14), Priya R. → Job postings (due Jun 1), All Leads → Migration runbooks (due Jun 20). Sarah already completed the on-call schedule update.',
+  'risk': 'Two risks were flagged in the session: (1) The July 31 migration deadline is soft — there\'s a decision gate on July 15th. If confidence is low, target shifts to mid-August. (2) The Kafka benchmark doc was referenced but not shared with the team — this is a knowledge gap.',
+  'q&a': 'The Q&A ran from 38:00–47:23. Main questions: Marcus asked about the fallback plan if payments migration slips (Sarah: July 31 is a target, not a commitment, with a July 15 check-in). Two other engineers asked about on-call shadow rotation details and the hiring timeline.',
+  'new engineer': 'Key context for new engineers: (1) We\'re migrating to microservices — payments is the pilot. (2) Kafka is the messaging layer. (3) Kong handles auth centrally — don\'t build auth in your service. (4) On-call is 2-week rotations with a shadow option for new folks. Watch the "Architecture: Kafka & Gateway" chapter (10:30–26:00) first.',
+  'default': 'Great question! Based on the transcript, I found relevant context at multiple points in the recording. The session covered architecture decisions, Q2 roadmap priorities, hiring plans, and process changes. Would you like me to jump to a specific section or extract more detail on any topic?'
+};
+
+function sendQuery() {
+  const input = document.getElementById('queryInput');
+  const q = input.value.trim();
+  if(!q) return;
+  addMessage('user', q);
+  input.value = '';
+  setTimeout(() => {
+    let resp = aiResponses.default;
+    const ql = q.toLowerCase();
+    if(ql.includes('technical') || ql.includes('decision') || ql.includes('kafka') || ql.includes('architecture')) resp = aiResponses['technical decisions'];
+    else if(ql.includes('action') || ql.includes('owner') || ql.includes('who')) resp = aiResponses['action item'];
+    else if(ql.includes('risk') || ql.includes('deadline') || ql.includes('delay')) resp = aiResponses['risk'];
+    else if(ql.includes('q&a') || ql.includes('question') || ql.includes('summarize')) resp = aiResponses['q&a'];
+    else if(ql.includes('new') || ql.includes('engineer') || ql.includes('hire') || ql.includes('onboard')) resp = aiResponses['new engineer'];
+    addMessage('ai', resp.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+  }, 600);
+}
+
+function askSuggestion(q) {
+  document.getElementById('queryInput').value = q;
+  sendQuery();
+}
+
+function addMessage(role, text) {
+  const history = document.getElementById('queryHistory');
+  const div = document.createElement('div');
+  div.className = 'query-msg ' + role;
+  const time = role === 'user' ? 'just now' : 'VideoIQ AI';
+  div.innerHTML = `<div class="qmsg-bubble">${text}</div><span class="qmsg-time">${time}</span>`;
+  history.appendChild(div);
+  history.scrollTop = history.scrollHeight;
+}
+
+// TRANSCRIPT SEARCH
+function searchTranscript(val) {
+  const blocks = document.querySelectorAll('.transcript-block .ts-text');
+  const v = val.toLowerCase();
+  blocks.forEach(b => {
+    const orig = b.textContent;
+    if(!v) { b.innerHTML = orig; return; }
+    const regex = new RegExp('(' + val.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+    b.innerHTML = orig.replace(regex, '<mark>$1</mark>');
+  });
+}
+
+// TIMELINE
+function handleTimelineClick(e) {
+  const bar = document.getElementById('timelineBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+  document.getElementById('tlProgress').style.width = pct + '%';
+  const totalSec = 2843;
+  const sec = Math.round((pct/100) * totalSec);
+  const min = Math.floor(sec/60), s = sec%60;
+  showToast('⏭ Jumped to ' + min + ':' + String(s).padStart(2,'0'), 'Use the transcript to find this moment');
+}
+
+function jumpTo(sec) {
+  const totalSec = 2843;
+  const pct = (sec/totalSec)*100;
+  document.getElementById('tlProgress').style.width = pct + '%';
+  const min = Math.floor(sec/60), s = sec%60;
+  showToast('▶ Playing from ' + min + ':' + String(s).padStart(2,'0'), 'Transcript highlighted at this moment');
+}
+
+function jumpToAction(sec) {
+  showPage('dashboard');
+  jumpTo(sec);
+  const tab = document.querySelector('.panel-tab[onclick*="transcript"]');
+  if(tab) switchTab(tab,'transcript');
+}
+
+// FILTER CHIPS
+function toggleFilter(chip) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+}
+
+// EXPORT
+function showExport() {
+  showToast('📤 Export options ready','Choose format below — Notion, PDF, Slack, Jira');
+}
+
+// TOAST
+let toastTimer;
+function showToast(msg, sub='') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastSub').textContent = sub;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
